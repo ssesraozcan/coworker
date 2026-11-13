@@ -1,0 +1,9 @@
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import { initialState, remaining, finish, purchase, claim, rewards, decode } from '../src/state/model.ts';
+test('timer uses a deadline and preserves paused time',()=>{const s={id:'a',duration:60,remaining:35,deadline:100000,goal:'test',shared:false};assert.equal(remaining(s,85000),15);assert.equal(remaining({...s,deadline:null},200000),35);assert.equal(remaining(s,101000),0)});
+test('completed sessions award once and early exit awards nothing',()=>{const state={...initialState,session:{id:'a',duration:60,remaining:60,deadline:100000,goal:'test',shared:false}};assert.equal(finish(state,99000).leaves,240);const done=finish(state,100000);assert.equal(done.leaves,265);assert.equal(done.records.length,1);assert.equal(finish(done,200000).leaves,265)});
+test('cannot overspend or duplicate a purchase',()=>{assert.equal(purchase({...initialState,leaves:79},'plant','a').placements.length,0);const bought=purchase(initialState,'plant','a');assert.equal(bought.leaves,160);assert.equal(purchase(bought,'plant','a').leaves,160)});
+test('reward claims require completion and are idempotent',()=>{const now=Date.now();const state={...initialState,records:[{id:'a',completedAt:now,minutes:25,shared:false}]};const id=rewards(state,now)[0].id;assert.equal(claim(initialState,id,now).leaves,240);const claimed=claim(state,id,now);assert.equal(claimed.leaves,255);assert.equal(claim(claimed,id,now).leaves,255)});
+test('three sessions in one day do not unlock a three-day reward',()=>{const now=Date.now();const s={...initialState,records:[1,2,3].map(n=>({id:String(n),completedAt:now,minutes:25,shared:false}))};assert.equal(rewards(s,now)[1].value,1)});
+test('invalid local storage recovers safely',()=>{assert.deepEqual(decode('bad json'),initialState);assert.deepEqual(decode('{"version":1,"state":{"leaves":-1}}'),initialState)});
