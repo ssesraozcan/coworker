@@ -66,3 +66,7 @@ npx expo export --platform all
 ```
 
 Mağaza yayını öncesinde hesaplar, sunucuda davet/kapasite denetimi, eşzamanlı ada üyeliği, gerçek mağaza aboneliği ve sunucuda abonelik doğrulaması bağlanmalıdır. Native paylaşım paneli için cihaz üzerinde son kontrol yapılmalıdır; otomatik ekran testleri web önizlemesindedir.
+
+### Ortak çalışma alanına kamera geçişi
+
+Adadaki “Ortak alan” noktasına dokunulduğunda kamera her ada görseli için tanımlı pergola merkezine yakınlaşır; iç sahneye yumuşak geçiş yapılır. “Adaya dön” aynı hareketi tersine oynatır. Görsel ekrana kaplanırken oluşan kırpma, dokunma alanının konumunda hesaba katılır. İşletim sisteminde hareket azaltma açıksa yakınlaşma yerine kısa bir solma kullanılır. İçeriden başlatılan ortak çalışma oturumu yerel sayaç ve ambiyans desteğini kullanır; canlı diğer üyeler henüz bağlı değildir.
