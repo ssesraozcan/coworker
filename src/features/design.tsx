@@ -87,9 +87,9 @@ export function GameButton({
     </Pressable>
   );
 }
-export function Vector({ asset, size = 24 }: { asset: number; size?: number }) {
+export function Vector({ asset, size = 24, onLoad }: { asset: number; size?: number; onLoad?: () => void }) {
   return (
-    <SvgUri uri={Asset.fromModule(asset).uri} width={size} height={size} />
+    <SvgUri uri={Asset.fromModule(asset).uri} width={size} height={size} onLoad={onLoad} />
   );
 }
 export function Back({ onPress }: { onPress?: () => void }) {

@@ -95,3 +95,28 @@ test("capacity modal and premium plans change only through explicit demo confirm
     ),
   ).toBe("monthly");
 });
+
+test('four houses actually grow and settle on the island after Premium', async ({page}) => {
+  await page.emulateMedia({reducedMotion:'no-preference'});
+  await page.goto('/premium');
+  await page.getByRole('button',{name:'Yıllık Premium · ₺1.200'}).click();
+  await page.getByRole('button',{name:'Demoyu dene'}).click();
+  await page.locator('[data-testid="new-house-4"] svg').waitFor({state:'attached'});
+  const samples=await page.evaluate(async()=>{
+    const values:number[][]=[[],[],[],[]];
+    for(let tick=0;tick<110;tick++){
+      for(let i=0;i<4;i++){const element=document.querySelector(`[data-testid="new-house-${i+1}"]`)!;values[i].push(new DOMMatrixReadOnly(getComputedStyle(element).transform).a);}
+      await new Promise(resolve=>setTimeout(resolve,20));
+    }
+    return values;
+  });
+  for(const values of samples){expect(Math.max(...values)).toBeGreaterThan(1.15);expect(values.at(-1)).toBeCloseTo(1,1);}
+  const peaks=samples.map(values=>values.findIndex(v=>v>1.15));
+  expect(peaks[1]).toBeGreaterThan(peaks[0]);expect(peaks[2]).toBeGreaterThan(peaks[1]);expect(peaks[3]).toBeGreaterThan(peaks[2]);
+});
+
+test('reduced motion shows all four houses without bounce',async({page})=>{
+  await page.emulateMedia({reducedMotion:'reduce'});await page.goto('/upgrade-success');
+  await page.locator('[data-testid="new-house-4"] svg').waitFor({state:'attached'});
+  for(let i=1;i<=4;i++)await expect(page.getByTestId(`new-house-${i}`)).toHaveCSS('transform','matrix(1, 0, 0, 1, 0, 0)');
+});
