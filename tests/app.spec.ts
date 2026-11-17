@@ -120,3 +120,14 @@ test('reduced motion shows all four houses without bounce',async({page})=>{
   await page.locator('[data-testid="new-house-4"] svg').waitFor({state:'attached'});
   for(let i=1;i<=4;i++)await expect(page.getByTestId(`new-house-${i}`)).toHaveCSS('transform','matrix(1, 0, 0, 1, 0, 0)');
 });
+
+test('nine through twelve members use distinct island images',async({page})=>{
+ await page.goto('/');await expect(page.getByText('Günün sana ait.')).toBeVisible();
+ const backgrounds:string[]=[];
+ for(const members of [9,10,11,12]){
+   await page.evaluate(n=>localStorage.setItem('coworkers:world:v2',JSON.stringify({members:n,premium:'annual',code:'KIYI27',plans:[]})),members);
+   await page.goto('/world');await expect(page.getByText(`${members} / 12`,{exact:true})).toBeVisible();
+   backgrounds.push(await page.locator('div').evaluateAll(nodes=>nodes.map(n=>getComputedStyle(n).backgroundImage).find(value=>value.startsWith('url('))||''));
+ }
+ expect(backgrounds.every(Boolean)).toBe(true);expect(new Set(backgrounds).size).toBe(4);
+});

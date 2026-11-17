@@ -7,5 +7,9 @@ export const islands = [
   require("../../assets/figma/5da7e.png"),
   require("../../assets/figma/ee3f8.png"),
   require("../../assets/figma/dac01.png"),
+  require("../../assets/figma/island-9.png"),
+  require("../../assets/figma/island-10.png"),
+  require("../../assets/figma/island-11.png"),
+  require("../../assets/figma/c6f9a.png"),
 ];
 export const premiumIsland = require("../../assets/figma/c6f9a.png");

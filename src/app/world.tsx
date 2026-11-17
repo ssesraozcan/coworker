@@ -3,7 +3,7 @@ import { ImageBackground, Modal, Pressable, View } from "react-native";
 import { router } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Copy, d, GameButton, Vector } from "../features/design";
-import { islands, premiumIsland } from "../features/assets";
+import { islands } from "../features/assets";
 import { useWorld } from "../features/world-store";
 import { capacity } from "../features/world-model";
 export default function World() {
@@ -12,11 +12,7 @@ export default function World() {
     [full, setFull] = useState(false);
   return (
     <ImageBackground
-      source={
-        world.members > 8
-          ? premiumIsland
-          : islands[Math.max(0, world.members - 1)]
-      }
+      source={islands[world.members - 1]}
       style={{ flex: 1 }}
       imageStyle={{width:"100%",height:"100%"}} resizeMode="cover"
     >
