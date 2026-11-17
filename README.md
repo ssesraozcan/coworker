@@ -38,3 +38,31 @@ npm run export:web
 ```
 
 Görsel kaynak: https://www.figma.com/design/9iiliqGARhFVzKvGfo0Xis/Coworking-Space
+
+## V2 · Dashboard, ada, Premium ve davet akışları
+
+Uygulama dashboard ile açılır. Takvimde çalışma planı eklenebilir; planlar ve ada önizlemesi cihazda saklanır. Dünyam, alt menünün gizlendiği tam ekran ada deneyimidir. Geri oku dashboard'a döner; ev, dekorasyon, odaklanma ve önceki özelliklere erişim korunur.
+
+- Figma'daki 1–8 ve 12 kişilik ada görselleri `assets/figma` içinde yerel dosyalardır.
+- Onaylı Midnight paleti, Outfit/Nunito yazıları, kabartmalı mor butonlar ve bitişik navigasyon kullanılır.
+- Premium: aylık ₺150 veya yıllık tek ödeme ₺1.200. **Gerçek satın alma entegrasyonu yoktur.** Kapasite yalnızca kullanıcının açıkça onayladığı demo adımında 12'ye çıkarılır; mağaza aboneliği veya geçerli bir Premium hakkı oluşturmaz.
+- Dört yeni ev ada üzerinde sıralı büyüme animasyonuyla görünür. Sistem hareket azaltma tercihi dikkate alınır.
+- “Daveti paylaş”, React Native `Share` ile iOS/Android'in gerçek sistem paylaşım panelini açar. Alıcıyı kullanıcı seçer; mesaj otomatik gönderilmez. Kod kopyalama `expo-clipboard` ile çalışır.
+- Paylaşılan bağlantı Expo geliştirme adresi / `coworkers` şeması ile üretilir. Üretimde doğrulanmış HTTPS Universal Links / Android App Links alan adı ve sunucu davet servisi gerekir.
+- **Üyelik, kod doğrulama ve kapasite yerel demodur.** `KIYI27` örnek kodu yalnızca aynı cihazdaki akışı denemek içindir. Başka telefondaki kullanıcıyı gerçek bir ortak adaya bağlamaz. Sunucusuz bu kod kimlik doğrulama veya yetkilendirme sağlamaz.
+- Profil → Ada senaryoları, 1–8 kişilik görselleri ve demo Premium sonrası genişletilmiş kapasiteyi incelemeyi sağlar. Demo üyeler gerçek kullanıcı değildir.
+
+### Doğrulama
+
+```sh
+npm run typecheck
+npm run lint
+npm test
+# Ayrı terminal: yerel web önizlemesi
+npx expo start --web --localhost --port 8084
+npm run test:e2e
+# iOS, Android ve web JavaScript paketleri
+npx expo export --platform all
+```
+
+Mağaza yayını öncesinde hesaplar, sunucuda davet/kapasite denetimi, eşzamanlı ada üyeliği, gerçek mağaza aboneliği ve sunucuda abonelik doğrulaması bağlanmalıdır. Native paylaşım paneli için cihaz üzerinde son kontrol yapılmalıdır; otomatik ekran testleri web önizlemesindedir.
