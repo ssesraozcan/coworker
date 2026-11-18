@@ -3,6 +3,7 @@ import { Pressable, ScrollView, TextInput, View } from "react-native";
 import { router } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Copy, d, GameButton, theme } from "./design";
+import { ObjectPlacements } from "../components/ObjectPlacements";
 import { useGame } from "../state/store";
 export function Commons({ onLeave }: { onLeave: () => void }) {
   const safe = useSafeAreaInsets(),
@@ -34,6 +35,7 @@ export function Commons({ onLeave }: { onLeave: () => void }) {
         paddingHorizontal: 20,
       }}
     >
+      <ObjectPlacements area="island" />
       <View style={[d.panel, { backgroundColor: "#20273FEE" }]}>
         <View style={[d.row, { justifyContent: "space-between" }]}>
           <Pressable
@@ -85,7 +87,7 @@ export function Commons({ onLeave }: { onLeave: () => void }) {
                   flex: 1,
                   minHeight: 44,
                   borderRadius: 14,
-                  backgroundColor: minutes === n ? theme.purple : theme.surface,
+                  backgroundColor: minutes === n ? "#B7DBD426" : theme.surface,
                   alignItems: "center",
                   justifyContent: "center",
                 }}

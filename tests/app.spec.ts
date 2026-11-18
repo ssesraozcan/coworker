@@ -15,7 +15,7 @@ test("dashboard, plan persistence, world, copy and invitation validation", async
     });
   });
   await page.goto("/");
-  await expect(page.getByText("Günün sana ait.")).toBeVisible();
+  await expect(page.getByText("Günün sana ait, Esra.")).toBeVisible();
   await page.getByRole("tab", { name: "Takvim", exact: true }).click();
   await page.getByRole("button", { name: "+ Çalışma planı ekle" }).click();
   await page
@@ -30,9 +30,13 @@ test("dashboard, plan persistence, world, copy and invitation validation", async
     page.getByText("Analiz çalışması").filter({ visible: true }),
   ).toBeVisible();
   await page.getByRole("tab", { name: "Dünyam", exact: true }).click();
-  await expect(page.getByRole("tab")).toHaveCount(0);
+  await expect(page.getByTestId("game-navigation")).toBeVisible();
+  await expect(
+    page.getByRole("tab", { name: "Günüm", exact: true }),
+  ).toHaveCount(0);
   await expect(page.getByText("İlk evim")).toBeVisible();
   await page.screenshot({ path: "../outputs/coworkers-v2-world.png" });
+  await page.getByRole("button", { name: "Ada üyeleri", exact: true }).click();
   await page
     .getByRole("button", { name: "Arkadaş davet et", exact: true })
     .click();
@@ -74,7 +78,7 @@ test("capacity modal and premium plans change only through explicit demo confirm
   page,
 }) => {
   await page.goto("/");
-  await expect(page.getByText("Günün sana ait.")).toBeVisible();
+  await expect(page.getByText("Günün sana ait, Esra.")).toBeVisible();
   await page.evaluate(() =>
     localStorage.setItem(
       "coworkers:world:v2",
@@ -82,6 +86,7 @@ test("capacity modal and premium plans change only through explicit demo confirm
     ),
   );
   await page.goto("/world");
+  await page.getByRole("button", { name: "Ada üyeleri", exact: true }).click();
   await page
     .getByRole("button", { name: "Arkadaş davet et", exact: true })
     .click();
@@ -161,7 +166,7 @@ test("nine through twelve members use distinct island images", async ({
   page,
 }) => {
   await page.goto("/");
-  await expect(page.getByText("Günün sana ait.")).toBeVisible();
+  await expect(page.getByText("Günün sana ait, Esra.")).toBeVisible();
   const backgrounds: string[] = [];
   for (const members of [9, 10, 11, 12]) {
     await page.evaluate(

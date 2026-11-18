@@ -1,20 +1,193 @@
-import React, { useEffect, useState } from 'react';
-import { View, Pressable } from 'react-native';
-import { router, useLocalSearchParams } from 'expo-router';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useAudioPlayer, setAudioModeAsync } from 'expo-audio';
-import { Button, Label, Nav, Scene, styles } from '../components/ui';
-import { useGame } from '../state/store';
-import { remaining } from '../state/model';
+import React, { useEffect, useRef, useState } from "react";
+import { View, Pressable } from "react-native";
+import { router, useLocalSearchParams } from "expo-router";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useAudioPlayer, setAudioModeAsync } from "expo-audio";
+import { Scene } from "../components/ui";
+import { Glass } from "../components/Glass";
+import { Copy, d, GameButton } from "../features/design";
+import { useGame } from "../state/store";
+import { remaining } from "../state/model";
 export default function Focus() {
- const {shared}=useLocalSearchParams<{shared?:string}>();
- const safe=useSafeAreaInsets(),{state,update}=useGame(),[,tick]=useState(0),[sound,setSound]=useState<'rain'|'sea'|'off'>('off');
- const rain=useAudioPlayer(require('../../assets/audio/rain.wav')),sea=useAudioPlayer(require('../../assets/audio/sea.wav'));
- const session=state.session;const seconds=session?remaining(session):0; const activeDeadline=session?.deadline;
- useEffect(()=>{setAudioModeAsync({playsInSilentMode:true}).catch(()=>{});const id=setInterval(()=>tick(n=>n+1),500);return()=>clearInterval(id)},[]);
- // Expo Audio exposes mutable native-player properties by design.
- // eslint-disable-next-line react-hooks/immutability
- useEffect(()=>{rain.loop=true;sea.loop=true;rain.volume=.3;sea.volume=.3;rain.pause();sea.pause();if(activeDeadline){if(sound==='rain')rain.play();if(sound==='sea')sea.play()}return()=>{rain.pause();sea.pause()}},[sound,activeDeadline,rain,sea]);
- function pause(){update(s=>s.session?{...s,session:s.session.deadline?{...s.session,remaining:remaining(s.session),deadline:null}:{...s.session,deadline:Date.now()+s.session.remaining*1000}}:s)}
- return <Scene image={shared==='1'?'commons':'desk'}><View style={[styles.top,{top:Math.max(safe.top,44)}]}><View style={[styles.panel,{flex:1,padding:13}]}><Label size={10} bold>ŞU AN ÇALIŞTIĞIM</Label><Label size={15} bold>{session?.goal||'Oturum tamamlandı'}</Label></View></View><View style={[styles.bottomPanel,{bottom:Math.max(safe.bottom,12)+84}]}>{session?<View style={styles.panel}><View style={[styles.row,{justifyContent:'space-between'}]}><View><Label size={11}>Kalan süre</Label><Label size={32} bold style={{fontVariant:['tabular-nums']}}>{Math.floor(seconds/60).toString().padStart(2,'0')}:{(seconds%60).toString().padStart(2,'0')}</Label></View><Button onPress={pause} style={{minWidth:140}}>{session.deadline?'Duraklat':'Devam et'}</Button></View><View style={styles.row}>{(['off','rain','sea'] as const).map(k=><Pressable key={k} accessibilityRole="button" onPress={()=>setSound(k)} style={{padding:9,borderRadius:12,backgroundColor:sound===k?'#E1E7BD':'#F0E5D1'}}><Label size={12}>{k==='off'?'Sessiz':k==='rain'?'Yağmur':'Deniz'}</Label></Pressable>)}</View><Pressable accessibilityRole="button" onPress={()=>{update(s=>({...s,session:null}));router.replace('/home')}}><Label size={12} style={{textAlign:'center'}}>Oturumu bitir · Ödül kazanılmaz</Label></Pressable></View>:<View style={styles.panel}><Label size={24} bold>{state.records.length?'Emeğine sağlık!':'Çalışmaya hazır mısın?'}</Label><Label>{state.records.length?'Tamamladığın oturum için 25 yaprak kazandın.':'Evinden bir hedef ve süre seçerek başlayabilirsin.'}</Label><Button onPress={()=>router.replace('/home')}>Evime dön</Button></View>}</View>{shared==='1'?<Pressable accessibilityRole="button" onPress={()=>router.back()} style={{position:'absolute',top:Math.max(safe.top,44)+90,left:20,padding:12,borderRadius:14,backgroundColor:'#20273F'}}><Label>‹ Ortak alana dön</Label></Pressable>:<Nav/>}</Scene>;
+  const params = useLocalSearchParams<{ shared?: string; sound?: string }>(),
+    safe = useSafeAreaInsets(),
+    { state, update } = useGame(),
+    [, tick] = useState(0),
+    [sound, setSound] = useState<"rain" | "sea" | "off">(
+      params.sound === "rain" ? "rain" : params.sound === "sea" ? "sea" : "off",
+    );
+  const rain = useAudioPlayer(require("../../assets/audio/rain.wav")),
+    sea = useAudioPlayer(require("../../assets/audio/sea.wav")),
+    session = state.session,
+    seconds = session ? remaining(session) : 0,
+    deadline = session?.deadline,
+    sessionId = useRef(session?.id);
+  useEffect(() => {
+    setAudioModeAsync({ playsInSilentMode: true }).catch(() => {});
+    const id = setInterval(() => tick((n) => n + 1), 500);
+    return () => clearInterval(id);
+  }, []);
+  useEffect(() => {
+    if (
+      !session &&
+      sessionId.current &&
+      state.records.some((r) => r.id === sessionId.current)
+    )
+      router.replace("/session-summary");
+  }, [session, state.records]);
+  // Native audio-player properties are intentionally mutable.
+  useEffect(() => {
+    /* eslint-disable react-hooks/immutability -- Expo Audio exposes mutable native-player properties. */
+    rain.loop = true;
+    sea.loop = true;
+    rain.volume = 0.3;
+    sea.volume = 0.3;
+    /* eslint-enable react-hooks/immutability */
+    rain.pause();
+    sea.pause();
+    if (deadline) {
+      if (sound === "rain") rain.play();
+      if (sound === "sea") sea.play();
+    }
+    return () => {
+      rain.pause();
+      sea.pause();
+    };
+  }, [sound, deadline, rain, sea]);
+  function pause() {
+    update((s) =>
+      s.session
+        ? {
+            ...s,
+            session: s.session.deadline
+              ? {
+                  ...s.session,
+                  remaining: remaining(s.session),
+                  deadline: null,
+                }
+              : {
+                  ...s.session,
+                  deadline: Date.now() + s.session.remaining * 1000,
+                },
+          }
+        : s,
+    );
+  }
+  return (
+    <Scene image={params.shared === "1" ? "commons" : "desk"}>
+      <View
+        style={{
+          position: "absolute",
+          top: Math.max(safe.top, 44),
+          left: 20,
+          right: 20,
+          gap: 14,
+        }}
+      >
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={
+            params.shared === "1" ? "Ortak alana dön" : "Günüme dön"
+          }
+          onPress={() =>
+            params.shared === "1" ? router.back() : router.replace("/")
+          }
+          style={{ alignSelf: "flex-start" }}
+        >
+          <Glass
+            style={{
+              paddingHorizontal: 16,
+              paddingVertical: 11,
+              backgroundColor: "#14213580",
+              borderRadius: 18,
+            }}
+          >
+            <Copy size={12}>
+              {params.shared === "1" ? "‹ Ortak alana dön" : "‹ Günüm"}
+            </Copy>
+          </Glass>
+        </Pressable>
+        <Glass style={{ padding: 16, backgroundColor: "#14213530", gap: 5 }}>
+          <Copy size={10} bold>
+            ŞU AN ÇALIŞTIĞIM
+          </Copy>
+          <Copy size={15} bold>
+            {session?.goal || "Oturum tamamlandı"}
+          </Copy>
+        </Glass>
+      </View>
+      <Glass
+        style={{
+          position: "absolute",
+          bottom: Math.max(safe.bottom, 34) + 40,
+          left: 16,
+          right: 16,
+          padding: 16,
+          backgroundColor: "#14213540",
+        }}
+      >
+        {session ? (
+          <View style={[d.row, { alignItems: "stretch" }]}>
+            <View style={{ flex: 1, gap: 4 }}>
+              <Copy size={10}>Kalan süre</Copy>
+              <Copy title size={36} style={{ fontVariant: ["tabular-nums"] }}>
+                {Math.floor(seconds / 60)
+                  .toString()
+                  .padStart(2, "0")}
+                :{(seconds % 60).toString().padStart(2, "0")}
+              </Copy>
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel="Ambiyans değiştir"
+                onPress={() =>
+                  setSound((v) =>
+                    v === "off" ? "rain" : v === "rain" ? "sea" : "off",
+                  )
+                }
+                style={{ minHeight: 28, justifyContent: "center" }}
+              >
+                <Copy size={10}>
+                  {sound === "rain"
+                    ? "Yağmur ambiyansı"
+                    : sound === "sea"
+                      ? "Deniz ambiyansı"
+                      : "Sessiz"}
+                </Copy>
+              </Pressable>
+            </View>
+            <View style={{ width: 145, gap: 8, justifyContent: "center" }}>
+              <GameButton onPress={pause}>
+                {session.deadline ? "Duraklat" : "Devam et"}
+              </GameButton>
+              <Pressable
+                accessibilityRole="button"
+                onPress={() => {
+                  update((s) => ({ ...s, session: null }));
+                  router.replace("/home");
+                }}
+                style={{
+                  minHeight: 32,
+                  borderRadius: 16,
+                  backgroundColor: "#142135A6",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <Copy size={10}>Oturumu bitir · Ödül kazanılmaz</Copy>
+              </Pressable>
+            </View>
+          </View>
+        ) : (
+          <View style={{ gap: 14 }}>
+            <Copy title size={23}>
+              Çalışmaya hazır mısın?
+            </Copy>
+            <GameButton onPress={() => router.replace("/home")}>
+              Evime dön
+            </GameButton>
+          </View>
+        )}
+      </Glass>
+    </Scene>
+  );
 }

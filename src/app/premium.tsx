@@ -66,8 +66,8 @@ export default function Premium() {
                 minHeight: 108,
                 borderRadius: 18,
                 borderWidth: annual === y ? 2 : 1,
-                borderColor: annual === y ? "#A691F5" : "#404A66",
-                backgroundColor: annual === y ? "#383059" : theme.surface,
+                borderColor: annual === y ? "#B7DBD4" : "#404A66",
+                backgroundColor: annual === y ? "#B7DBD426" : theme.surface,
                 gap: 10,
               }}
             >

@@ -39,18 +39,19 @@ npm run export:web
 
 Görsel kaynak: https://www.figma.com/design/9iiliqGARhFVzKvGfo0Xis/Coworking-Space
 
-## V2 · Dashboard, ada, Premium ve davet akışları
+## V3 · Son tasarım
 
-Uygulama dashboard ile açılır. Takvimde çalışma planı eklenebilir; planlar ve ada önizlemesi cihazda saklanır. Dünyam, alt menünün gizlendiği tam ekran ada deneyimidir. Geri oku dashboard'a döner; ev, dekorasyon, odaklanma ve önceki özelliklere erişim korunur.
-
-- Figma'daki 1–8 ve 12 kişilik ada görselleri `assets/figma` içinde yerel dosyalardır.
-- Onaylı Midnight paleti, Outfit/Nunito yazıları, kabartmalı mor butonlar ve bitişik navigasyon kullanılır.
-- Premium: aylık ₺150 veya yıllık tek ödeme ₺1.200. **Gerçek satın alma entegrasyonu yoktur.** Kapasite yalnızca kullanıcının açıkça onayladığı demo adımında 12'ye çıkarılır; mağaza aboneliği veya geçerli bir Premium hakkı oluşturmaz.
-- Dört yeni ev ada üzerinde sıralı büyüme animasyonuyla görünür. Sistem hareket azaltma tercihi dikkate alınır.
-- “Daveti paylaş”, React Native `Share` ile iOS/Android'in gerçek sistem paylaşım panelini açar. Alıcıyı kullanıcı seçer; mesaj otomatik gönderilmez. Kod kopyalama `expo-clipboard` ile çalışır.
-- Paylaşılan bağlantı Expo geliştirme adresi / `coworkers` şeması ile üretilir. Üretimde doğrulanmış HTTPS Universal Links / Android App Links alan adı ve sunucu davet servisi gerekir.
-- **Üyelik, kod doğrulama ve kapasite yerel demodur.** `KIYI27` örnek kodu yalnızca aynı cihazdaki akışı denemek içindir. Başka telefondaki kullanıcıyı gerçek bir ortak adaya bağlamaz. Sunucusuz bu kod kimlik doğrulama veya yetkilendirme sağlamaz.
-- Profil → Ada senaryoları, 1–8 kişilik görselleri ve demo Premium sonrası genişletilmiş kapasiteyi incelemeyi sağlar. Demo üyeler gerçek kullanıcı değildir.
+- Sabit haftalık takvimli dashboard, cam kartlar, mint işlem butonları; diğer arayüz zeminlerinde düz lacivert.
+- Ada, Evim, Dolabım için yüzen oyun kapsülü; sağında ayrı Ana sayfa dönüş butonu. Planlama menüsü oyun içinde kullanılmaz.
+- Sade profil ve rutin düzenleme: günlük dakika hedefi ve haftanın günleri cihazda saklanır. Dashboard ve profil aynı hedefi kullanır.
+- 40 özgün şeffaf obje: Eşyalarım / Keşfet / Ödüller, kategori ve arama, açılıp kapanan filtreler, yatay vitrin ve 3 sütunlu liste. Kilit yalnızca seçili vitrin objesinde veya liste kartında görünür.
+- Yaprakla tek seferlik obje edinme, çalışarak açılan kilometre taşı hediyeleri; evde veya ortak alanda konum seçerek yerleştirme, dolaba geri alma. Obje mülkiyeti paylaşırken korunur.
+- Ödüller ve dolap ekranlarında uygulamaya özel, sade açık dolap arka planı. Görseller yereldir.
+- Destekleyen iOS cihazlarında native Liquid Glass; diğer platformlarda bulanıklık ve saydam yüzeyler.
+- 1–12 ev için ayrı ada görselleri, Premium sonrası dört ev animasyonu ve ortak alana yakınlaşma korunur.
+- Premium: aylık ₺150 veya yıllık tek ödeme ₺1.200. Gerçek tahsilat bağlı değildir; yükseltme yalnızca açıkça onaylanan demo adımında uygulanır.
+- Daveti paylaş, işletim sisteminin gerçek paylaşım panelini açar. Kod kopyalanabilir. Davet doğrulama ve ada kapasitesi bu sürümde cihaz içi önizlemedir; başka cihazlar aynı canlı adaya bağlanmaz.
+- Bildirim tercihi kaydedilir; native bildirim gönderimi henüz bağlı değildir.
 
 ### Doğrulama
 

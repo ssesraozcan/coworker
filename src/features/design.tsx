@@ -14,13 +14,16 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { SvgUri } from "react-native-svg";
 import { Asset } from "expo-asset";
 import { islands } from "./assets";
+import { Glass } from "../components/Glass";
+import { Feather } from "@expo/vector-icons";
 export const theme = {
   bg: "#141A2E",
   surface: "#232B45",
   nav: "#20273F",
   text: "#F2F4FC",
   muted: "#B4BDD3",
-  purple: "#8274D4",
+  purple: "#B7DBD4",
+  accent: "#B7DBD4",
   teal: "#81CCC2",
 };
 export function Copy({
@@ -54,16 +57,29 @@ export function Copy({
     </Text>
   );
 }
+export function Icon({
+  name,
+  size = 20,
+  color = theme.text,
+}: {
+  name: React.ComponentProps<typeof Feather>["name"];
+  size?: number;
+  color?: string;
+}) {
+  return <Feather name={name} size={size} color={color} />;
+}
 export function GameButton({
   children,
   onPress,
   disabled = false,
   style,
+  glass = false,
 }: {
   children: React.ReactNode;
   onPress: () => void;
   disabled?: boolean;
   style?: ViewStyle;
+  glass?: boolean;
 }) {
   return (
     <Pressable
@@ -71,25 +87,61 @@ export function GameButton({
       disabled={disabled}
       onPress={onPress}
       style={({ pressed }) => [
-        d.game,
-        {
-          opacity: disabled ? 0.45 : 1,
-          transform: [{ translateY: pressed ? 4 : 0 }],
-        },
+        { opacity: disabled ? 0.45 : pressed ? 0.8 : 1 },
         style,
       ]}
     >
-      <LinearGradient colors={["#A691F5", "#6E57BA"]} style={d.gameInner}>
-        <Copy bold size={16}>
-          {children}
-        </Copy>
-      </LinearGradient>
+      {glass ? (
+        <Glass
+          light
+          style={{
+            minHeight: 56,
+            borderRadius: 28,
+            justifyContent: "center",
+            alignItems: "center",
+            paddingHorizontal: 16,
+          }}
+        >
+          <Copy bold size={15}>
+            {children}
+          </Copy>
+        </Glass>
+      ) : (
+        <View
+          style={{
+            minHeight: 52,
+            borderRadius: 24,
+            backgroundColor: "#B7DBD4",
+            alignItems: "center",
+            justifyContent: "center",
+            paddingHorizontal: 16,
+            boxShadow: "0px 4px 16px #6BB7A620",
+          }}
+        >
+          <Copy bold size={14} style={{ color: "#173C3C" }}>
+            {children}
+          </Copy>
+        </View>
+      )}
     </Pressable>
   );
 }
-export function Vector({ asset, size = 24, onLoad }: { asset: number; size?: number; onLoad?: () => void }) {
+export function Vector({
+  asset,
+  size = 24,
+  onLoad,
+}: {
+  asset: number;
+  size?: number;
+  onLoad?: () => void;
+}) {
   return (
-    <SvgUri uri={Asset.fromModule(asset).uri} width={size} height={size} onLoad={onLoad} />
+    <SvgUri
+      uri={Asset.fromModule(asset).uri}
+      width={size}
+      height={size}
+      onLoad={onLoad}
+    />
   );
 }
 export function Back({ onPress }: { onPress?: () => void }) {
@@ -117,7 +169,7 @@ export function Atmosphere({
     <ImageBackground
       source={source || islands[0]}
       resizeMode="cover"
-      imageStyle={{width:"100%",height:premium?650:"100%"}}
+      imageStyle={{ width: "100%", height: premium ? 650 : "100%" }}
       style={{ flex: 1, backgroundColor: theme.bg }}
     >
       <LinearGradient
@@ -224,8 +276,10 @@ export const d = StyleSheet.create({
     borderRadius: 16,
   },
   panel: {
-    backgroundColor: theme.surface,
-    borderRadius: 20,
+    backgroundColor: "#FFFFFF0A",
+    borderWidth: 1,
+    borderColor: "#FFFFFF24",
+    borderRadius: 24,
     padding: 16,
     gap: 10,
   },
@@ -235,9 +289,9 @@ export const d = StyleSheet.create({
     fontFamily: "Nunito",
     padding: 14,
     minHeight: 48,
-    borderRadius: 14,
+    borderRadius: 24,
     borderWidth: 1,
-    borderColor: "#404A66",
+    borderColor: "#FFFFFF24",
   },
   content: { flex: 1, paddingHorizontal: 20 },
   muted: { color: theme.muted },
